@@ -16,11 +16,15 @@ class VideoFaceDetector:
                            'right_eye', 'top_lip', 'bottom_lip',
                            'face']
 
-    def __init__(self, port_to_capture: int = 0):
-        self.cap = cv2.VideoCapture(port_to_capture)
+    def __init__(self, input_source=0):
+        """
+        Input source can be port of camera or path to video
+        :param input_source:
+        """
+        self.cap = cv2.VideoCapture(input_source)
         ret, image = self.cap.read()
         if not ret:
-            raise Exception(f"Port {port_to_capture} is not accessible")
+            raise Exception(f'Input source "{input_source}" is not accessible')
         self.height = image.shape[0]
         self.width = image.shape[1]
         self.set_face_landmarks_random_colors()
@@ -86,11 +90,3 @@ class VideoFaceDetector:
                                                        cords_list=face_cords_list[face_landmark],
                                                        bgr_color=self.face_landmarks_colors[face_landmark])
         return image
-
-
-
-
-if __name__ == '__main__':
-    vfd = VideoFaceDetector()
-    vfd.stream(vfd.highlight_face)
-    # vfd.stream(vfd.highlight_face_landmarks)
