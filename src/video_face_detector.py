@@ -16,7 +16,7 @@ class VideoFaceDetector:
                            'right_eye', 'top_lip', 'bottom_lip',
                            'face']
 
-    def __init__(self, input_source=0):
+    def __init__(self, input_source=0, image_compression=4):
         """
         Input source can be port of camera or path to video
         :param input_source:
@@ -28,6 +28,7 @@ class VideoFaceDetector:
         self.height = image.shape[0]
         self.width = image.shape[1]
         self.set_face_landmarks_random_colors()
+        self.image_compression = image_compression
 
     def stream(self, image_edit_function = lambda x: x):
         while True:
@@ -67,8 +68,10 @@ class VideoFaceDetector:
 
     def detect_faces(self, image):
         rgb_small_frame = image[:, :, ::-1]
-        face_locations = face_recognition.face_locations(cv2.resize(rgb_small_frame, (0, 0), fx=0.25, fy=0.25))
-        face_locations = tuple([el*4 for el in fl] for fl in face_locations)
+        face_locations = face_recognition.face_locations(
+            cv2.resize(rgb_small_frame, (0, 0), fx=1/self.image_compression, fy=1/self.image_compression)
+        )
+        face_locations = tuple([el*self.image_compression for el in fl] for fl in face_locations)
         return face_locations
 
     def highlight_face(self, image):
